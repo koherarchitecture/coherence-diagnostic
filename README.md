@@ -1,5 +1,9 @@
 # Coherence Diagnostic
 
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![Koher](https://img.shields.io/badge/koher-tool-teal.svg)](https://koher.app)
+
 Analyse design concepts for coherence. See what's strong, thin, or unclear.
 
 **Part of [Koher](https://koher.app) — AI handles language. Code handles judgment. Humans make decisions.**
