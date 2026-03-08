@@ -452,9 +452,9 @@ MIT — use it, modify it, ship it.
 
 ## Part of Koher
 
-This tool demonstrates the Koher architecture. More tools ship monthly.
+This tool demonstrates the Koher architecture. One tool every three months.
 
 - **Website:** [koher.app](https://koher.app)
 - **All tools:** [github.com/koher-architecture](https://github.com/koher-architecture)
 
-*Built by [Prayas Abhinav](https://prayasabhinav.net)*
+*Co-created by [Prayas Abhinav](https://prayasabhinav.net) + [Claude Code](https://claude.ai/code)*
