@@ -15,7 +15,7 @@ Analyse design concepts for coherence. See what's strong, thin, or unclear.
 ### Run Locally (Open Access Mode)
 
 ```bash
-git clone https://github.com/koher-architecture/coherence-diagnostic.git
+git clone https://github.com/koherarchitecture/coherence-diagnostic.git
 cd coherence-diagnostic
 pip install -r backend/requirements.txt
 cp config.env.example config.env
@@ -232,7 +232,7 @@ When you ask AI to "judge whether this is good," you lose auditability. When you
 
 ```bash
 # Clone the repository
-git clone https://github.com/koher-architecture/coherence-diagnostic.git
+git clone https://github.com/koherarchitecture/coherence-diagnostic.git
 cd coherence-diagnostic
 
 # Create virtual environment
@@ -455,6 +455,6 @@ MIT — use it, modify it, ship it.
 This tool demonstrates the Koher architecture. One tool every three months.
 
 - **Website:** [koher.app](https://koher.app)
-- **All tools:** [github.com/koher-architecture](https://github.com/koher-architecture)
+- **All tools:** [github.com/koherarchitecture](https://github.com/koherarchitecture)
 
 *Co-created by [Prayas Abhinav](https://prayasabhinav.net) + [Claude Code](https://claude.ai/code)*
