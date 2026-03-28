@@ -1,0 +1,100 @@
+{
+  "$schema": "https://fundingjson.org/schema/v1.1.0.json",
+  "version": "v1.1.0",
+  "entity": {
+    "type": "individual",
+    "role": "owner",
+    "name": "Prayas Abhinav",
+    "email": "hello@koher.app",
+    "description": "Koher is an open-source practice that builds free AI tools separating language from judgment. AI reads input and narrates output. Deterministic code handles all judgment. Tools are free, MIT-licensed, and require no login. Built by a teacher for students.",
+    "webpageUrl": {
+      "url": "https://koher.app"
+    }
+  },
+  "projects": [
+    {
+      "guid": "coherence-diagnostic",
+      "name": "Coherence Diagnostic",
+      "description": "Analyses design writing for structural coherence across five dimensions (claim, evidence, scope, assumptions, gaps). A fine-tuned DeBERTa model qualifies input, deterministic rules judge severity, Claude Haiku narrates the diagnosis. 98.38% classification accuracy.",
+      "webpageUrl": {
+        "url": "https://coherence-demo.koher.app"
+      },
+      "repositoryUrl": {
+        "url": "https://github.com/koherarchitecture/coherence-diagnostic"
+      },
+      "licenses": ["spdx:MIT"],
+      "tags": ["education", "ai", "design", "nlp", "open-source"]
+    },
+    {
+      "guid": "play-shape-diagnostic",
+      "name": "Play Shape Diagnostic",
+      "description": "Maps the structural shape of play concepts across six dimensions. Human selection replaces AI classification at the qualification stage. Embedding-based relationship rules surface patterns. Narrative generation from pre-computed similarities.",
+      "webpageUrl": {
+        "url": "https://playshape-demo.koher.app"
+      },
+      "repositoryUrl": {
+        "url": "https://github.com/koherarchitecture/play-shape-diagnostic"
+      },
+      "licenses": ["spdx:MIT"],
+      "tags": ["education", "game-design", "ai", "open-source"]
+    },
+    {
+      "guid": "fragment-mapper",
+      "name": "Fragment Mapper",
+      "description": "Shows structural relationships between scattered text fragments. Four orthogonal signals (embedding similarity, TF-IDF distinctiveness, VADER sentiment, lexical profile) feed six deterministic rules that surface neighbours, strays, rifts, forks, echoes, and shifts. No content generated. No evaluation.",
+      "webpageUrl": {
+        "url": "https://fragmentmapper-demo.koher.app"
+      },
+      "repositoryUrl": {
+        "url": "https://github.com/koherarchitecture/fragment-mapper"
+      },
+      "licenses": ["spdx:MIT"],
+      "tags": ["education", "writing", "ai", "nlp", "open-source"]
+    }
+  ],
+  "funding": {
+    "channels": [
+      {
+        "guid": "upi",
+        "type": "payment-provider",
+        "address": "prayas@koher.app",
+        "description": "UPI (India)"
+      },
+      {
+        "guid": "bank-transfer",
+        "type": "bank",
+        "description": "Bank transfer — contact hello@koher.app for details"
+      }
+    ],
+    "plans": [
+      {
+        "guid": "sustain-monthly",
+        "status": "active",
+        "name": "Monthly sustainer",
+        "description": "Covers server hosting, API costs, and domain renewals for all deployed tools",
+        "amount": 0,
+        "currency": "INR",
+        "frequency": "monthly",
+        "channels": ["upi", "bank-transfer"]
+      },
+      {
+        "guid": "one-time",
+        "status": "active",
+        "name": "One-time contribution",
+        "description": "Any amount. Goes directly to infrastructure and intern stipends.",
+        "amount": 0,
+        "currency": "INR",
+        "frequency": "one-time",
+        "channels": ["upi", "bank-transfer"]
+      }
+    ],
+    "history": [
+      {
+        "year": 2026,
+        "expenses": 14400,
+        "currency": "INR",
+        "description": "Server hosting (2 droplets), API costs (OpenRouter, HF), 4 domains"
+      }
+    ]
+  }
+}
