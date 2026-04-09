@@ -357,6 +357,7 @@ async def stream_diagnosis(concept: str, evaluation: dict):
             stream = client.chat.completions.create(
                 model="anthropic/claude-haiku-4.5",
                 max_tokens=500,
+                temperature=0,
                 messages=[
                     {"role": "system", "content": HAIKU_SYSTEM_PROMPT},
                     {"role": "user", "content": user_prompt}
@@ -398,6 +399,7 @@ async def get_full_diagnosis(concept: str, evaluation: dict) -> str:
             response = client.chat.completions.create(
                 model="anthropic/claude-haiku-4.5",
                 max_tokens=500,
+                temperature=0,
                 messages=[
                     {"role": "system", "content": HAIKU_SYSTEM_PROMPT},
                     {"role": "user", "content": user_prompt}
