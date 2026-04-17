@@ -426,9 +426,9 @@ GAPS_THRESHOLD_EXAMINE = 0.5    # 0.2–0.5 = WORTH_EXAMINING
 **Architecture:** DeBERTa-v3-base, fine-tuned for multi-label classification
 
 **Training:**
-- ~4,186 annotated design concepts
-- 5 binary labels (one per dimension)
-- Validation accuracy: 98.38% (arithmetic mean across five classifiers; per-dimension accuracies 97.37%–99.28%)
+- 4,186 design concept statements with five binary labels (Claude-generated bootstrap corpus, calibrated against interview transcripts from the author's design teaching practice; full corpus released in `corpus/`)
+- Validation accuracy: 98.38% mean (per-dimension 97.37%–99.28%; F1 micro 97.91%) on a held-out random 10% split of the bootstrap corpus
+- See `aggregate-performance.md`, `annotation-schema.md`, and `corpus/README.md` for full methodology and what these numbers do and do not establish
 
 **Size:** ~738MB (model.safetensors: 705MB)
 
