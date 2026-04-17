@@ -6,7 +6,7 @@
 
 Analyse design concepts for coherence. See what's strong, thin, or unclear.
 
-**Part of [Koher](https://koher.app) — AI handles language. Code handles judgment. Humans make decisions.**
+**Part of [Koher](https://koher.app) — AI handles language. Code handles judgement. Humans make decisions.**
 
 ---
 
@@ -141,7 +141,7 @@ coherence-diagnostic/
 │   ├── index-open.html           # Open access frontend (no auth)
 │   └── admin.html                # Admin panel
 ├── src/
-│   └── stage2_rules.py           # Deterministic judgment rules
+│   └── stage2_rules.py           # Deterministic judgement rules
 └── models/
     └── deberta-coherence/        # Trained DeBERTa model (~738MB)
         ├── model.safetensors
@@ -200,12 +200,12 @@ This tool demonstrates the Koher three-layer architecture:
 │  Pure Python code — no AI                                   │
 │  Input: confidence scores → Output: severity levels         │
 │  Thresholds: >0.8 = SOLID, 0.5–0.8 = EXAMINE, <0.5 = ATTENTION │
-│  Principle: Code handles judgment                           │
+│  Principle: Code handles judgement                           │
 └─────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────┐
 │  STAGE 3: Language Interface                                │
-│  Claude Haiku explains the judgment                         │
+│  Claude Haiku explains the judgement                         │
 │  Input: severity levels → Output: plain language diagnosis  │
 │  Principle: AI narrates decisions already made              │
 └─────────────────────────────────────────────────────────────┘
@@ -213,7 +213,7 @@ This tool demonstrates the Koher three-layer architecture:
 
 **Why separate layers?**
 - Stage 1 (AI): Good at pattern recognition across language
-- Stage 2 (Code): Judgment is auditable, reproducible, explicit
+- Stage 2 (Code): Judgement is auditable, reproducible, explicit
 - Stage 3 (AI): Good at narrating decisions already made
 
 When you ask AI to "judge whether this is good," you lose auditability. When you separate the layers, you gain it back.
@@ -399,7 +399,7 @@ Direct AI analysis (bypasses Koher architecture for comparison).
 
 ## Stage 2 Rules
 
-The judgment logic lives in `src/stage2_rules.py`. It's pure Python — no AI, no network calls, no randomness.
+The judgement logic lives in `src/stage2_rules.py`. It's pure Python — no AI, no network calls, no randomness.
 
 **Thresholds:**
 ```python
@@ -426,9 +426,9 @@ GAPS_THRESHOLD_EXAMINE = 0.5    # 0.2–0.5 = WORTH_EXAMINING
 **Architecture:** DeBERTa-v3-base, fine-tuned for multi-label classification
 
 **Training:**
-- 5,600 annotated design concepts
+- ~4,186 annotated design concepts
 - 5 binary labels (one per dimension)
-- Validation accuracy: 98.38%
+- Validation accuracy: 98.38% (arithmetic mean across five classifiers; per-dimension accuracies 97.37%–99.28%)
 
 **Size:** ~738MB (model.safetensors: 705MB)
 
