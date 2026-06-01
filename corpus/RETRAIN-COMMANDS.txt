@@ -1,0 +1,63 @@
+============================================================
+COHERENCE RETRAIN — copy/paste commands (run in YOUR terminal)
+Prepared 27 May 2026, 22:04. GPU step — do NOT run via an agent.
+============================================================
+
+Corpus is relabelled and validated:
+  train.relabel.deberta.jsonl   4186 rows, 0 bad   (training set)
+  val.relabel.deberta.jsonl      722 rows, 0 bad   (clean holdout — NOT used in training)
+Run everything below FROM this directory:
+  cd /Users/prayasabhinav/Dropbox/personal_projects/koher/tools-release/coherence-diagnostic/corpus
+(On a separate Linux GPU box, cd to the synced equivalent of that path.)
+
+------------------------------------------------------------
+0) PREREQS  (training needs a CUDA GPU, Ampere+ — train_stage1.py sets bf16=True)
+------------------------------------------------------------
+python -m venv .train-venv
+source .train-venv/bin/activate          # Windows: .train-venv\Scripts\activate
+pip install -U torch transformers sentencepiece protobuf tiktoken scikit-learn numpy accelerate
+
+# NOTE: if you are NOT on CUDA (e.g. Mac MPS / CPU), open train_stage1.py and
+# change  bf16=True  ->  bf16=False  first, or it will error.
+
+------------------------------------------------------------
+1) RETRAIN  (trains on corrected labels; self-splits 90/10 for early stopping)
+------------------------------------------------------------
+python train_stage1.py \
+  --train_data train.relabel.deberta.jsonl \
+  --output_dir model-v1.1-relabel \
+  --num_epochs 5 --batch_size 8 --learning_rate 2e-5
+
+# ~minutes to ~30 min depending on GPU. Saves the new model to model-v1.1-relabel/.
+# The current deployed model (../models/deberta-coherence) is NOT touched.
+# IGNORE the "Final Results" accuracy it prints — that is accuracy vs the labels it
+# just trained on, NOT a before/after. The real test is step 2.
+
+------------------------------------------------------------
+2) HONEST BEFORE/AFTER  (same corrected holdout for both models; CPU is fine)
+------------------------------------------------------------
+# OLD (currently deployed) model:
+python evaluate_model.py --model ../models/deberta-coherence --data val.relabel.deberta.jsonl
+
+# NEW model:
+python evaluate_model.py --model model-v1.1-relabel          --data val.relabel.deberta.jsonl
+
+------------------------------------------------------------
+3) WHAT SUCCESS LOOKS LIKE
+------------------------------------------------------------
+Comparing NEW vs OLD on the printout:
+  - EVIDENCE and ASSUMPTIONS accuracy: UP.
+  - "pred-PRESENT-when-ABSENT" for EVIDENCE/ASSUMPTIONS: DOWN sharply  <-- this is Pablo's bug.
+  - PROBES: the "fluent, NO evidence" probe's EV and AS drop below 0.50,
+            while the "WITH real evidence" and "EXPLICIT assumption" probes stay high.
+Keep both printouts — that side-by-side IS the evidence the fix worked
+(usable for Pablo and for grant impact reporting).
+
+------------------------------------------------------------
+4) SHIP — only after you are satisfied, and only on an explicit go-ahead
+------------------------------------------------------------
+See RELABEL-RUNBOOK.md "Step 5 — Ship". In short: tar model-v1.1-relabel ->
+new GitHub Release v1.1 -> bump the URL in entrypoint.sh -> clear the /app/models
+volume so v1.1 is fetched -> redeploy -> re-run Pablo's input on the live demo.
+(Uploading the release artefact needs an explicit "ship"/"release" instruction.)
+============================================================

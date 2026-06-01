@@ -1,0 +1,38 @@
+============================================================
+COHERENCE RETRAIN — launch on the GPU box
+Prepared 1 June 2026. Spot-check done; go-ahead given.
+Run these in YOUR terminal on the GPU machine. (Not via an agent; not on the Mac.)
+============================================================
+
+# 1. Go to the corpus folder (the Dropbox-synced equivalent path on the GPU box)
+cd /Users/prayasabhinav/Dropbox/personal_projects/koher/tools-release/coherence-diagnostic/corpus
+
+# 2. SMTP env so it emails you when done.
+#    Credentials live in the local, gitignored file corpus/.smtp.env (NOT in this public repo).
+#    Just source it — it sets POSTAL_SMTP_HOST / PORT / USERNAME / PASSWORD.
+source ./.smtp.env
+#    (If .smtp.env is missing on this box, recreate it with the four POSTAL_SMTP_* exports.
+#     The script still runs without it; it just skips the email and prints the outcome.)
+
+# 3. Run the consolidated sequence (prereqs -> train -> before/after eval -> email)
+./run-retrain-sequence.sh
+
+# Optional knobs (defaults shown): EPOCHS=5 BATCH_SIZE=8 LR=2e-5 OUTPUT_DIR=model-v1.1-relabel
+#   e.g.  EPOCHS=8 ./run-retrain-sequence.sh
+
+------------------------------------------------------------
+SAFETY (verified 1 June 2026)
+------------------------------------------------------------
+- Reads only train.relabel.deberta.jsonl / val.relabel.deberta.jsonl (read-only).
+- Writes ONLY: .train-venv/ , model-v1.1-relabel/ , eval-compare-<timestamp>.txt
+- Does NOT touch train.jsonl, val.jsonl, or ../models/deberta-coherence (deployed v1.0).
+- Does NOT relabel and does NOT ship. Step 5 (release/deploy) needs a separate go-ahead.
+
+------------------------------------------------------------
+WHAT YOU GET
+------------------------------------------------------------
+- New model:      model-v1.1-relabel/
+- Evidence log:   eval-compare-<timestamp>.txt   (emailed to me@prayas.in, attached)
+- Success = NEW vs OLD: EVIDENCE/ASSUMPTIONS accuracy UP, "pred-PRESENT-when-ABSENT"
+  DOWN sharply, fluent-no-evidence probe EV/AS below 0.50.
+============================================================

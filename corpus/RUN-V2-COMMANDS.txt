@@ -1,0 +1,62 @@
+============================================================
+COHERENCE RETRAIN v2 — INSTRUMENTED + GATED  (run on the GPU box, NOT via an agent)
+Prepared 1 June 2026. Successor to the 1 June run that collapsed silently.
+============================================================
+
+WHAT'S DIFFERENT (why this won't waste another 30 minutes):
+  - CANARY FIRST: overfits ~16 rows in ~20s. If the stack can't learn that, it can't
+    learn anything — the script ABORTS before the full run and tells you to pin versions.
+  - fp32 by default (1 June used bf16 and never learned). Compare with PRECISION=bf16.
+  - HONEST email: PASS / FAILED-COLLAPSE / FAILED-WEIGHTS / INCONCLUSIVE — never a green
+    light on a dead model (the old script emailed "DONE" on a collapsed model).
+  - SAVES EVERYTHING into diagnostics-<timestamp>/ (env, exact pip freeze, nvidia-smi,
+    full train log, per-epoch metrics, weight check, before/after eval JSON+txt, verdict)
+    and emails it as a tarball. This is the data we lacked on 1 June.
+
+------------------------------------------------------------
+RUN IT
+------------------------------------------------------------
+cd ~/Dropbox/personal_projects/koher/tools-release/coherence-diagnostic/corpus
+source ./.smtp.env                 # SMTP for the result email (gitignored; already on this box)
+
+# optional: clear the failed 1-June output so nothing stale lingers
+rm -rf model-v1.1-relabel
+
+./run-retrain-v2.sh                 # canary -> full fp32 train -> before/after -> verdict + email
+
+------------------------------------------------------------
+IF THE CANARY FAILS  (email subject: FAILED-MACHINERY)
+------------------------------------------------------------
+The stack itself can't learn — not the data, not the relabel. In order:
+  1.  PRECISION=bf16 ./run-retrain-v2.sh      # then PRECISION=fp16 — does any precision learn?
+  2.  Pin the January stack: the ONLY thing new vs the 98% run is today's latest-everything
+      venv + CUDA 13. Read diagnostics-*/env.txt for the exact versions that failed, recreate
+      .train-venv pinned to the known-good versions, and re-run.
+  3.  Data-vs-stack proof (if ever in doubt):
+        TRAIN_DATA=train.jsonl VAL_DATA=val.jsonl ./run-retrain-v2.sh
+      Collapse on the ORIGINAL data too = 100% the stack, full stop.
+
+------------------------------------------------------------
+KNOBS (env vars)
+------------------------------------------------------------
+PRECISION=fp32|bf16|fp16   EPOCHS=5   BATCH_SIZE=8   LR=2e-5   SKIP_CANARY=0
+  e.g.  EPOCHS=8 LR=1e-5 ./run-retrain-v2.sh
+
+------------------------------------------------------------
+WHAT YOU GET / WHAT "PASS" MEANS
+------------------------------------------------------------
+- New model:     model-v1.1-relabel/   (only trustworthy if verdict = PASS)
+- Bundle:        diagnostics-<timestamp>/  (+ .tar.gz, emailed to me@prayas.in)
+- PASS requires ALL of: model learned (f1_micro>0, finite weights saved), AND
+  EVIDENCE+ASSUMPTIONS "pred-present-when-absent" DOWN vs the OLD model, AND the
+  Pablo-shape probe EV<0.5 while real-evidence probe EV>=0.5.
+- Even on PASS, the before/after is YOUR call. SHIP (Step 5) stays manual and needs an
+  explicit 'ship' go-ahead. The deployed v1.0 is untouched throughout.
+
+------------------------------------------------------------
+SAFETY
+------------------------------------------------------------
+Reads train.relabel.deberta.jsonl / val.relabel.deberta.jsonl (read-only).
+Writes only: .train-venv/, model-v1.1-relabel/, diagnostics-*/.
+Does NOT touch ../models/deberta-coherence (deployed v1.0). Does NOT ship.
+============================================================

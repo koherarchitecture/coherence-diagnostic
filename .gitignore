@@ -66,3 +66,15 @@ anant-*.md
 anant-*.pdf
 faculty-position.*
 whatsapp-share.txt
+
+# Local SMTP credentials for retrain notify — never commit
+corpus/.smtp.env
+*.smtp.env
+
+# Retrain artifacts — models ship via GitHub Releases, not git; diagnostics are local evidence
+corpus/model-v1.1-relabel/
+corpus/diagnostics-*/
+corpus/diagnostics-*.tar.gz
+corpus/.train-venv/
+corpus/eval-compare-*.txt
+corpus/*.relabel.cache.jsonl
