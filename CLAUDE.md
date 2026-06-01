@@ -18,7 +18,7 @@ Takes a design concept (2-8 sentences) and shows what's strong, thin, or unclear
 2. **Stage 2 (Rules):** Converts confidence → 3 severity levels (deterministic)
 3. **Stage 3 (Haiku):** Translates severity → plain language diagnosis (API)
 
-**Architectural principle:** AI handles language. Code handles judgment.
+**Architectural principle:** AI handles language. Code handles judgement.
 
 ---
 

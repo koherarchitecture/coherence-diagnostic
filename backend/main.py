@@ -50,29 +50,11 @@ from stage2_rules import evaluate_concept, Severity
 # Prompts
 # =============================================================================
 
-# Direct AI system prompt (for comparison mode - no 3-stage pipeline)
-DIRECT_AI_SYSTEM_PROMPT = """You are a design coherence analyst. A student has submitted a design concept.
-Evaluate it across five dimensions:
-
-1. CLAIM: Is there a clear, testable statement about what the design will achieve?
-2. EVIDENCE: Is the claim supported by observation or data?
-3. SCOPE: Are boundaries defined (who, where, when)?
-4. ASSUMPTIONS: Are underlying beliefs acknowledged?
-5. GAPS: Does reasoning connect problem to solution without logical jumps?
-
-For each dimension, assess whether it is:
-- Strong (clearly present)
-- Unclear (something there, but vague)
-- Weak/Missing (absent or problematic)
-
-Then provide a brief diagnosis (3-6 sentences) explaining what's weak or unclear and why it matters.
-
-Rules:
-- No academic jargon
-- No praise for what's strong
-- No prescriptive fixes ("you should..." is forbidden)
-- Name what's weak or vague and why, specifically
-- Use the student's own words where possible"""
+# Direct AI system prompt (for comparison mode - no 3-stage pipeline).
+# Deliberately minimal: the prompt does not prescribe dimensions, severity
+# labels, format, or length. Letting the LLM choose its own shape is what
+# makes the divergence from the three-stage pipeline visible.
+DIRECT_AI_SYSTEM_PROMPT = "Evaluate this design concept."
 
 # Haiku system prompt (from spec.md)
 HAIKU_SYSTEM_PROMPT = """You are a design coherence analyst. A student has submitted
