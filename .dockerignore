@@ -1,0 +1,11 @@
+# The 704MB weights are NOT baked into the image — entrypoint downloads them
+# from the GitHub Release on first run. Keep them (and dev cruft) out of the build.
+models/deberta-coherence/model.safetensors
+**/.venv
+**/__pycache__
+**/*.pyc
+.git
+corpus/
+data/
+*.tar
+quant-report-*.json

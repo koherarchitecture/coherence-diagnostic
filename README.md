@@ -17,6 +17,7 @@ Analyse design concepts for coherence. See what's strong, thin, or unclear.
 ```bash
 git clone https://github.com/koherarchitecture/coherence-diagnostic.git
 cd coherence-diagnostic
+./download_model.sh                 # fetch the ~704MB DeBERTa weights (GitHub Release)
 pip install -r backend/requirements.txt
 cp config.env.example config.env
 # Edit config.env: add your OPENROUTER_API_KEY
@@ -25,6 +26,8 @@ uvicorn backend.main:app --reload
 ```
 
 Requires Python 3.11+, ~750MB disk (for model weights), and an [OpenRouter API key](https://openrouter.ai/).
+
+> **Model weights:** the trained DeBERTa weights (~704MB) are hosted as a [GitHub Release tarball](https://github.com/koherarchitecture/coherence-diagnostic/releases/tag/v1.0) (`model.tar.gz`), not in the git tree (GitHub's 100MB file limit). `download_model.sh` fetches and extracts them into `models/deberta-coherence/`; the Docker image does the same automatically on first run.
 
 ---
 
@@ -242,6 +245,9 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 # Install dependencies
 pip install -r backend/requirements.txt
 
+# Download the DeBERTa weights (~704MB) from the GitHub Release
+./download_model.sh
+
 # Create configuration
 cp config.env.example config.env
 # Edit config.env with your settings
@@ -276,7 +282,7 @@ docker run -p 8000:8000 \
   coherence-diagnostic
 ```
 
-**Note:** The DeBERTa model (~750MB) downloads automatically on first deploy. It persists in the `/app/models` volume — subsequent container restarts use the cached model.
+**Note:** The DeBERTa weights (~704MB) download automatically on first run from the [GitHub Release](https://github.com/koherarchitecture/coherence-diagnostic/releases/tag/model-v1.0) (the small config/tokenizer files are baked into the image). They persist in the `/app/models` volume — subsequent container restarts use the cached model.
 
 ### Docker Compose
 

@@ -52,7 +52,9 @@ coherence-diagnostic.tar
 .cache/
 .pytest_cache/
 
-# Model checkpoints (keep model.safetensors but ignore training checkpoints)
+# Model weights ship via GitHub Release tarball, NOT git (100MB limit; LFS too small).
+# download_model.sh / entrypoint.sh fetch them. Keep them and training checkpoints out.
+models/deberta-coherence/model.safetensors
 models/deberta-coherence/checkpoint-*/
 
 # User database

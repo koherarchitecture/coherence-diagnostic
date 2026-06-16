@@ -19,10 +19,9 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install git and git-lfs for model download on first run
+# Install curl for downloading the model weights (GitHub Release) on first run
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git \
-    git-lfs \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy installed packages from builder
@@ -36,6 +35,9 @@ COPY frontend/ ./frontend/
 COPY src/ ./src/
 COPY entrypoint.sh .
 RUN chmod +x entrypoint.sh
+
+# Model weights are NOT baked in — entrypoint downloads + extracts the GitHub
+# Release tarball into the persistent /app/models volume on first run.
 
 # Copy config.env.example as reference (user should create config.env)
 COPY config.env.example .
