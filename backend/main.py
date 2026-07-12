@@ -712,10 +712,19 @@ FRONTEND_PATH = Path(__file__).parent.parent / "frontend"
 
 @app.get("/", include_in_schema=False)
 async def serve_frontend():
-    """Serve the frontend index.html."""
+    """Serve the frontend index.html.
+
+    No-cache headers so a returning visitor always gets the current build. The
+    whole app (markup + inline JS/CSS) lives in this one file, so a stale cached
+    copy silently keeps old behaviour until a hard reload.
+    """
     index_path = FRONTEND_PATH / "index.html"
     if index_path.exists():
-        return FileResponse(index_path)
+        return FileResponse(index_path, headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+        })
     return {"error": "Frontend not found"}
 
 
