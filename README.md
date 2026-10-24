@@ -202,7 +202,7 @@ This tool demonstrates the Koher three-layer architecture:
 │  STAGE 2: Deterministic Rules                               │
 │  Pure Python code — no AI                                   │
 │  Input: confidence scores → Output: severity levels         │
-│  Thresholds: >0.8 = SOLID, 0.5–0.8 = EXAMINE, <0.5 = ATTENTION │
+│  Thresholds: >0.8 = SOLID, >0.5–0.8 = EXAMINE, ≤0.5 = ATTENTION│
 │  Principle: Code handles judgement                           │
 └─────────────────────────────────────────────────────────────┘
                               ↓
@@ -411,12 +411,12 @@ The judgement logic lives in `src/stage2_rules.py`. It's pure Python — no AI, 
 ```python
 # Standard dimensions (high confidence = good)
 THRESHOLD_SOLID = 0.8       # > 0.8 = SOLID
-THRESHOLD_EXAMINE = 0.5     # 0.5–0.8 = WORTH_EXAMINING
-                            # < 0.5 = ATTENTION_NEEDED
+THRESHOLD_EXAMINE = 0.5     # > 0.5 and ≤ 0.8 = WORTH_EXAMINING
+                            # ≤ 0.5 = ATTENTION_NEEDED
 
 # GAPS has inverted polarity (high confidence = gaps present = bad)
-GAPS_THRESHOLD_SOLID = 0.2      # < 0.2 = SOLID
-GAPS_THRESHOLD_EXAMINE = 0.5    # 0.2–0.5 = WORTH_EXAMINING
+GAPS_THRESHOLD_SOLID = 0.2      # ≤ 0.2 = SOLID
+GAPS_THRESHOLD_EXAMINE = 0.5    # > 0.2 and ≤ 0.5 = WORTH_EXAMINING
                                 # > 0.5 = ATTENTION_NEEDED
 ```
 

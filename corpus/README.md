@@ -10,7 +10,7 @@ The corpus is a **bootstrap corpus**. The 4,186 design concept statements and th
 
 **No statements were drawn directly from student work**, and no human rater other than the author was involved in calibration.
 
-The deployed Coherence Diagnostic logs real student concept statements alongside classifier outputs as a foundation for eventual retraining. Usage is not yet at the volume that would justify a v2 retrain on logged data; when it is, the corpus and the model will be revised accordingly.
+The deployed Coherence Diagnostic stores no concept statements and no model outputs, so there is no logged data to retrain on. A corpus drawn from real student work would have to be gathered separately, with consent.
 
 ---
 

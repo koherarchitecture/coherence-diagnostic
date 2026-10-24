@@ -55,9 +55,9 @@ THRESHOLD_EXAMINE = 0.5     # > this (and <= SOLID) = WORTH_EXAMINING
                             # <= this = ATTENTION_NEEDED
 
 # Inverted polarity (GAPS): high confidence = problem present
-GAPS_THRESHOLD_SOLID = 0.2      # < this = SOLID (no gaps)
-GAPS_THRESHOLD_EXAMINE = 0.5    # < this (and >= SOLID) = WORTH_EXAMINING
-                                # >= this = ATTENTION_NEEDED (gaps present)
+GAPS_THRESHOLD_SOLID = 0.2      # <= this = SOLID (no gaps)
+GAPS_THRESHOLD_EXAMINE = 0.5    # > SOLID (and <= this) = WORTH_EXAMINING
+                                # > this = ATTENTION_NEEDED (gaps present)
 
 
 # =============================================================================
@@ -91,6 +91,21 @@ def classify_confidence(dimension: str, confidence: float) -> str:
             return Severity.WORTH_EXAMINING
         else:
             return Severity.ATTENTION_NEEDED
+
+
+def threshold_rule(dimension: str, severity: str) -> str:
+    """The threshold classify_confidence applied, written out for the page."""
+    if dimension == "GAPS":
+        return {
+            Severity.ATTENTION_NEEDED: f"> {GAPS_THRESHOLD_EXAMINE:.2f} (inverted polarity)",
+            Severity.WORTH_EXAMINING: f"> {GAPS_THRESHOLD_SOLID:.2f} and ≤ {GAPS_THRESHOLD_EXAMINE:.2f} (inverted polarity)",
+            Severity.SOLID: f"≤ {GAPS_THRESHOLD_SOLID:.2f} (inverted polarity)",
+        }[severity]
+    return {
+        Severity.SOLID: f"> {THRESHOLD_SOLID:.2f}",
+        Severity.WORTH_EXAMINING: f"> {THRESHOLD_EXAMINE:.2f} and ≤ {THRESHOLD_SOLID:.2f}",
+        Severity.ATTENTION_NEEDED: f"≤ {THRESHOLD_EXAMINE:.2f}",
+    }[severity]
 
 
 def get_severity_map(stage1_output: Dict[str, float]) -> Dict[str, str]:

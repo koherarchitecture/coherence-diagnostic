@@ -43,7 +43,7 @@ from config import (
 
 # Add src directory to path for stage2_rules import
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
-from stage2_rules import evaluate_concept, Severity
+from stage2_rules import evaluate_concept, threshold_rule, Severity
 
 
 # =============================================================================
@@ -194,6 +194,7 @@ class ScoreResponse(BaseModel):
     confidence: float
     severity: str
     display: str
+    rule: str
 
 
 class AnalyseResponse(BaseModel):
@@ -490,7 +491,8 @@ def format_score(dimension: str, confidence: float, severity: str) -> ScoreRespo
         dimension=dimension,
         confidence=round(confidence, 3),
         severity=severity,
-        display=display
+        display=display,
+        rule=threshold_rule(dimension, severity)
     )
 
 

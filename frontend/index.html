@@ -1198,7 +1198,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
                         </div>
                         <div class="annotation">
                             <div class="annotation-title">Why deterministic rules?</div>
-                            <div class="annotation-text">Code handles judgement. Thresholds are explicit: >0.8 = SOLID, 0.5–0.8 = EXAMINE, <0.5 = ATTENTION. Same input always produces same output. No AI hallucination of criteria.</div>
+                            <div class="annotation-text">Code handles judgement. Thresholds are explicit: >0.8 = SOLID, >0.5 to 0.8 = EXAMINE, ≤0.5 = ATTENTION; GAPS runs the other way: ≤0.2 = SOLID, >0.2 to 0.5 = EXAMINE, >0.5 = ATTENTION. Same input always produces same output. No AI hallucination of criteria.</div>
                         </div>
 
                         <div class="koher-stage" id="koherStage3">
@@ -1356,18 +1356,6 @@ if(__exports != exports)module.exports = exports;return module.exports}));
             section.style.display = (hasDirect && inRelevantMode) ? '' : 'none';
         }
 
-        function thresholdRuleFor(dim, confidence) {
-            // Returns just the threshold expression — the severity label is
-            // printed separately so it isn't duplicated.
-            if (dim === 'GAPS') {
-                if (confidence < 0.2) return '< 0.20 (inverted polarity)';
-                if (confidence < 0.5) return 'in 0.20–0.50 (inverted polarity)';
-                return '> 0.50 (inverted polarity)';
-            }
-            if (confidence > 0.8) return '> 0.80';
-            if (confidence >= 0.5) return 'in 0.50–0.80';
-            return '< 0.50';
-        }
 
         function buildReliabilityMarkdown(directResult, koherData) {
             const concept = (directResult.concept || '').replace(/\s*\n+\s*/g, ' ').trim();
@@ -1378,7 +1366,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
             const thresholdList = scores.map(s => {
                 const symbol = (s.display || '').charAt(0) || '•';
                 const sev = (s.severity || '').replace(/_/g, ' ');
-                return `- **${s.dimension}** &nbsp;${s.confidence.toFixed(2)} → rule: ${thresholdRuleFor(s.dimension, s.confidence)} → ${symbol} **${sev}**`;
+                return `- **${s.dimension}** &nbsp;${s.confidence.toFixed(2)} → rule: ${s.rule} → ${symbol} **${sev}**`;
             }).join('\n');
 
             const needs = scores.find(s => s.severity === 'ATTENTION_NEEDED');
