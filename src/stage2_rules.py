@@ -405,7 +405,7 @@ def evaluate_concept(stage1_output: Dict[str, Union[int, float]]) -> Dict[str, A
         "examine_count": examine_count,
         "solid_count": solid_count,
         "total_dimensions": 4,
-        "overall_status": "NEEDS_WORK" if attention_count > 0 else "COHERENT"
+        "overall_status": "GAPS_FOUND" if attention_count > 0 else "NO_GAPS_FOUND"
     }
 
     return evaluation
@@ -464,11 +464,11 @@ def format_feedback(evaluation: Dict[str, Any]) -> str:
     lines = []
 
     summary = evaluation["summary"]
-    if summary["overall_status"] == "COHERENT":
-        lines.append("Overall: COHERENT")
+    if summary["overall_status"] == "NO_GAPS_FOUND":
+        lines.append("Overall: no gaps found")
         lines.append("")
     else:
-        lines.append(f"Overall: NEEDS WORK ({summary['attention_count']} areas need attention)")
+        lines.append(f"Overall: gaps found in {summary['attention_count']} areas")
         lines.append("")
 
     for key in ["claim_evidence", "scope", "assumptions", "gaps"]:
@@ -592,7 +592,7 @@ def test_all_states():
         assert "severity_levels" in result
         assert result["summary"]["attention_count"] >= 0
         assert result["summary"]["attention_count"] <= 4
-        assert result["summary"]["overall_status"] in ["NEEDS_WORK", "COHERENT"]
+        assert result["summary"]["overall_status"] in ["GAPS_FOUND", "NO_GAPS_FOUND"]
 
         # Verify all dimensions present
         for key in ["claim_evidence", "scope", "assumptions", "gaps"]:

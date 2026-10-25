@@ -211,6 +211,7 @@ This tool demonstrates the Koher three-layer architecture:
 │  Claude Haiku explains the judgement                         │
 │  Input: severity levels → Output: plain language diagnosis  │
 │  Principle: AI narrates decisions already made              │
+│  Checked in code for judging words before it is sent        │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -220,6 +221,8 @@ This tool demonstrates the Koher three-layer architecture:
 - Stage 3 (AI): Good at narrating decisions already made
 
 When you ask AI to "judge whether this is good," you lose auditability. When you separate the layers, you gain it back.
+
+**The narration is held to describing in code.** Before it is sent, every narration is checked for judging words and phrases (*good*, *weak*, *strong*, *sound*, *clearly*, *a real problem* and others, listed as `JUDGING` in `backend/main.py`), including words the student used. A draft that uses one is rewritten, twice at most; if every draft judges, the narration is built from the Stage 2 rules' own findings, with no model. The check reads only what is on its list, so a judging phrase off the list can still pass.
 
 ---
 
@@ -376,7 +379,7 @@ Analyse a design concept and return scores with diagnosis.
 
 #### `POST /analyse/stream`
 
-Same as above, but streams the diagnosis via Server-Sent Events.
+Same as above, over Server-Sent Events: the scores first, then the checked diagnosis as one event (it is checked whole, so it is not streamed word by word).
 
 #### `POST /analyse/direct`
 

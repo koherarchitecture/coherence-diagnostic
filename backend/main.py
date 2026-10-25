@@ -19,6 +19,7 @@ Feature toggle via config.py / config.env:
 """
 
 import json
+import re
 import asyncio
 import random
 from pathlib import Path
@@ -80,7 +81,14 @@ Rules:
 - No praise for what's strong (skip SOLID dimensions)
 - No prescriptive fixes ("you should..." is forbidden)
 - 3-6 sentences maximum
-- Name what's weak or vague and why, specifically
+- Say specifically what is vague or missing and why the tool
+  cannot tell; describe it, never judge whether the concept is good
+- Never use judging words or phrases (good, bad, weak, strong,
+  poor, excellent, great, impressive, effective, compelling, solid,
+  sound, valid, clearly, importantly, well done, works well, needs
+  work, should, 'a real problem', 'the real issue'), even ones
+  the student used. Code checks every narration and refuses one
+  that uses them
 - Use the student's own words where possible
 - If asking questions, make them genuine (not rhetorical)
 - Do not contradict the scores or severity levels"""
@@ -324,83 +332,75 @@ Stage 2 evaluation:
 MAX_RETRIES = 3
 RETRY_DELAY = 2
 
+# The narration describes and never grades, and code holds it to that (25 October 2026).
+# A draft using a judging word, even one the student used, is rewritten, twice at most; if
+# every draft fails, the narration is built from the rules' own findings, with no model.
+JUDGING = re.compile(r"\b(good|bad|weak(?:ly|er|est|ness|nesses)?|strong(?:ly|er|est)?|strengths?|poor(?:ly)?|excellent|great|"
+                     r"impressive|effective(?:ly)?|compelling|promising|valuable|valid|sound|robust|solid ground|"
+                     r"well[- ](?:done|written|thought|designed|argued|grounded)|works? well|needs? work|should|"
+                     r"clearly|obviously|certainly|importantly|crucial(?:ly)?|"
+                     r"(?:a|the) real (?:problem|issue|need|question|challenge|gap))\b", re.I)
+DIMENSION_NAMES = {"claim_evidence": "Claim and evidence", "scope": "Scope", "assumptions": "Assumptions", "gaps": "Reasoning"}
+
+
+def judging_words(text: str) -> list:
+    """Judging words in a draft. A word the student used is refused too: quoted back, it still grades."""
+    return sorted({w.lower() for w in JUDGING.findall(text)})
+
+
+def findings_narration(evaluation: dict) -> str:
+    """A narration built from the rules' findings alone, used when every draft judged."""
+    lines = [f"**{DIMENSION_NAMES[k]}:** {evaluation[k]['finding']}" for k in DIMENSION_NAMES
+             if evaluation[k]["severity"] != "SOLID"]
+    return "\n\n".join(lines) or "The rules found nothing vague or missing on the four dimensions."
+
+
+async def guarded_diagnosis(concept: str, evaluation: dict) -> str:
+    """Ask for the narration, check it in code, and rewrite or replace it if it judges."""
+    messages = [{"role": "system", "content": HAIKU_SYSTEM_PROMPT},
+                {"role": "user", "content": build_haiku_prompt(concept, evaluation)}]
+    for draft in range(3):
+        for attempt in range(MAX_RETRIES):
+            try:
+                response = client.chat.completions.create(
+                    model="anthropic/claude-haiku-4.5", max_tokens=500, temperature=0, messages=messages)
+                break
+            except openai.APIStatusError as e:
+                if (e.status_code == 529 or "overloaded" in str(e).lower()) and attempt < MAX_RETRIES - 1:
+                    await asyncio.sleep(RETRY_DELAY * (attempt + 1))
+                    continue
+                raise
+        text = response.choices[0].message.content or ""
+        found = judging_words(text)
+        if text.strip() and not found:
+            return text
+        messages += [{"role": "assistant", "content": text},
+                     {"role": "user", "content": f"That draft judges the concept ({', '.join(found) or 'empty'}). "
+                                                 "Rewrite it to describe only: what is vague or missing, and why the tool cannot tell."}]
+    return findings_narration(evaluation)
+
 
 async def stream_diagnosis(concept: str, evaluation: dict):
-    """Stream diagnosis from Haiku via OpenRouter with retry logic."""
-    global client
-
+    """Send the checked narration as one event; it is checked whole, so it is not streamed word by word."""
     if not client:
         yield "data: [Diagnosis unavailable - API key not configured]\n\n"
         return
-
-    user_prompt = build_haiku_prompt(concept, evaluation)
-
-    for attempt in range(MAX_RETRIES):
-        try:
-            stream = client.chat.completions.create(
-                model="anthropic/claude-haiku-4.5",
-                max_tokens=500,
-                temperature=0,
-                messages=[
-                    {"role": "system", "content": HAIKU_SYSTEM_PROMPT},
-                    {"role": "user", "content": user_prompt}
-                ],
-                stream=True
-            )
-            for chunk in stream:
-                if chunk.choices and chunk.choices[0].delta.content:
-                    yield f"data: {json.dumps({'text': chunk.choices[0].delta.content})}\n\n"
-
-            yield "data: [DONE]\n\n"
-            return
-
-        except openai.APIStatusError as e:
-            if e.status_code == 529 or "overloaded" in str(e).lower():
-                if attempt < MAX_RETRIES - 1:
-                    yield f"data: {json.dumps({'info': f'API busy, retrying ({attempt + 1}/{MAX_RETRIES})...'})}\n\n"
-                    await asyncio.sleep(RETRY_DELAY * (attempt + 1))
-                    continue
-            yield f"data: {json.dumps({'error': str(e)})}\n\n"
-            return
-
-        except Exception as e:
-            yield f"data: {json.dumps({'error': str(e)})}\n\n"
-            return
+    try:
+        text = await guarded_diagnosis(concept, evaluation)
+        yield f"data: {json.dumps({'text': text})}\n\n"
+        yield "data: [DONE]\n\n"
+    except Exception as e:
+        yield f"data: {json.dumps({'error': str(e)})}\n\n"
 
 
 async def get_full_diagnosis(concept: str, evaluation: dict) -> str:
-    """Get complete diagnosis (non-streaming) via OpenRouter with retry logic."""
-    global client
-
+    """Get the complete, checked narration."""
     if not client:
         return "[Diagnosis unavailable - API key not configured]"
-
-    user_prompt = build_haiku_prompt(concept, evaluation)
-
-    for attempt in range(MAX_RETRIES):
-        try:
-            response = client.chat.completions.create(
-                model="anthropic/claude-haiku-4.5",
-                max_tokens=500,
-                temperature=0,
-                messages=[
-                    {"role": "system", "content": HAIKU_SYSTEM_PROMPT},
-                    {"role": "user", "content": user_prompt}
-                ]
-            )
-            return response.choices[0].message.content
-
-        except openai.APIStatusError as e:
-            if e.status_code == 529 or "overloaded" in str(e).lower():
-                if attempt < MAX_RETRIES - 1:
-                    await asyncio.sleep(RETRY_DELAY * (attempt + 1))
-                    continue
-            return f"[Error: {str(e)}]"
-
-        except Exception as e:
-            return f"[Error: {str(e)}]"
-
-    return "[Error: Max retries exceeded]"
+    try:
+        return await guarded_diagnosis(concept, evaluation)
+    except Exception as e:
+        return f"[Error: {str(e)}]"
 
 
 # =============================================================================

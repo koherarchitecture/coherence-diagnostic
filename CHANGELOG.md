@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased] — 2026-10-25
+
+### Changed
+- **The narration is checked in code before it is sent.** Each draft is read for judging words and phrases (`JUDGING` in `backend/main.py`), including words the student used; a draft that uses one is rewritten, twice at most, and if every draft judges or comes back empty, the narration is built from the Stage 2 rules' own findings, with no model.
+- **The narration prompt no longer asks the model to "name what's weak"**; it asks what is vague or missing, and why the tool cannot tell.
+- **`/analyse/stream` sends the narration as one event**, after it is checked, instead of word by word.
+- **Stage 2's overall label describes instead of grading:** `overall_status` is `GAPS_FOUND` or `NO_GAPS_FOUND` (it was `NEEDS_WORK` or `COHERENT`).
+
+### Known limit
+- The check reads only what is on its list; a judging phrase off it can still pass.
+
 ## [1.2.0] — 2026-02-16
 
 ### Added
